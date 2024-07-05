@@ -1,5 +1,4 @@
 import os
-import shutil
 import winreg
 
 from lxml import etree
@@ -112,6 +111,7 @@ def picker_version():
         show_selected=True,
         use_shortcuts=True,
     ).ask()
+    if not result: return
     return get_command(result)
 
 
@@ -135,11 +135,12 @@ def main():
         questionary.print(f'当前系统没有安装微信', 'red')
         return
     ver_str = hex_version2str(hex(vn))
-    questionary.print('正在清除已安装的RadiumWMPF', 'yellow')
-    clean_rwmpf()
     questionary.print(f'当前微信版本：{ver_str}', '#ff0fff')
     cmd = picker_version()
     if not cmd: return
+    questionary.print('正在清除已安装的RadiumWMPF', 'yellow')
+    clean_rwmpf()
+    questionary.print('搜索 `:showcmdwnd` 触发`Config Setting`对话框', '#ff0fff')
     questionary.print('请输入以下指令开始更新\n', '#ff0fff')
     questionary.print(cmd, 'red bold')
 

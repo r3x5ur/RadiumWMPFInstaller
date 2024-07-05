@@ -18,7 +18,7 @@ URL = 'https://github.com/r3x5ur/RadiumWMPFInstaller'
 EMAIL = 'me@example.com'
 AUTHOR = 'r3x5ur'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.1.0'
+VERSION = '0.1.2'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -103,12 +103,12 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
+    # packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     # If your package is a single module, use this instead of 'packages':
-    # py_modules=['mypackage'],
+    py_modules=['rwmpf'],
     entry_points={
         'console_scripts': [
-            f'{NAME}=main:main'
+            f'{NAME}=rwmpf:main'
         ],
     },
     install_requires=REQUIRED,
@@ -121,7 +121,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Environment :: Win32 (MS Windows)',
         'Environment :: Console',
-        'Operating System :: Microsoft :: Windows'
+        'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
