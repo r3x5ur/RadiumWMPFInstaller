@@ -1,5 +1,6 @@
 import os
 import winreg
+from os.path import basename
 
 from lxml import etree
 import requests
@@ -7,6 +8,7 @@ import platform
 import questionary
 
 CONFIG_URL = 'https://dldir1.qq.com/weixin/Windows/XPlugin/updateConfigWin.xml'
+WECHATSETUP = 'https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.9.10.27/WeChatSetup-3.9.10.27.exe' # noqa
 
 
 def query_wechat_version():
@@ -15,6 +17,20 @@ def query_wechat_version():
             return winreg.QueryValueEx(key, 'Version')[0]
     except FileNotFoundError:
         return None
+
+
+def query_wechat_install_path():
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r'Software\Tencent\WeChat', 0, winreg.KEY_READ) as key:
+            return winreg.QueryValueEx(key, 'InstallPath')[0]
+    except FileNotFoundError:
+        return None
+
+
+def get_wechat_uninstall_path():
+    install_path = query_wechat_install_path()
+    if install_path:
+        return os.path.join(install_path, 'Uninstall.exe')
 
 
 # 版本号算法
@@ -105,14 +121,18 @@ def picker_version():
 
     vers = filter_update_config()
     choices = list(map(picker_mapper, vers))
+    ROLLBACK_VAL = -65535
+    choices.append(questionary.Choice([('red bold', f'没找到想要的版本？(回退微信客户端版本)')], value=ROLLBACK_VAL))
     result = questionary.select(
         "请选择你想安装的 RadiumWMPF 版本",
         choices=choices,
         show_selected=True,
         use_shortcuts=True,
     ).ask()
+    if result == ROLLBACK_VAL:
+        return f'curl "{WECHATSETUP}" -o {basename(WECHATSETUP)}', 'client'
     if not result: return
-    return get_command(result)
+    return get_command(result), 'RadiumWMPF'
 
 
 def clean_rwmpf():
@@ -136,13 +156,30 @@ def main():
         return
     ver_str = hex_version2str(hex(vn))
     questionary.print(f'当前微信版本：{ver_str}', '#ff0fff')
-    cmd = picker_version()
-    if not cmd: return
-    questionary.print('正在清除已安装的RadiumWMPF', 'yellow')
-    clean_rwmpf()
-    questionary.print('搜索 `:showcmdwnd` 触发`Config Setting`对话框', '#ff0fff')
-    questionary.print('请输入以下指令开始更新\n', '#ff0fff')
+    result = picker_version()
+    if not result: return
+    cmd, typ = result
+    if typ == 'RadiumWMPF':
+        questionary.print('正在清除已安装的RadiumWMPF', 'yellow')
+        clean_rwmpf()
+        questionary.print('搜索 `:showcmdwnd` 触发`Config Setting`对话框', '#ff0fff')
+        questionary.print('请输入以下指令开始更新', '#ff0fff')
+    elif typ == 'client':
+        questionary.print('回退版本将会退出微信，并卸载在当前版本微信', 'red bold')
+        if not questionary.confirm('确定回退吗？', False).ask():
+            questionary.print('已取消回退', 'grey')
+            return
+        questionary.print('正在卸载微信，请记得勾选保留本地数据', 'red bold')
+        os.system('taskkill /f /im WeChat.exe >nul 2>&1')
+        os.system('taskkill /f /im XWeChat.exe >nul 2>&1')
+        clean_rwmpf()
+        uninstall = get_wechat_uninstall_path()
+        if uninstall:
+            os.system(f'start "" "{uninstall}"')
+        questionary.print('请执行以下命令开始下载旧版本微信', '#ff0fff')
+    questionary.print('=' * 20 + '>', 'grey')
     questionary.print(cmd, 'red bold')
+    questionary.print('<' + '=' * 20, 'grey')
 
 
 if __name__ == '__main__':

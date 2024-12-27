@@ -42,3 +42,12 @@ RadiumWMPFInstaller
 ### 也可能会有错误情况，重新执行脚本即可
 
 ![](images/img4.png)
+
+### 降低客户端版本
+
+- 如果没找到想安装的 `RadiumWMPF` 版本，可以 
+[安装旧版本客户端](https://github.com/tom-snow/wechat-windows-versions/releases)
+
+
+- **卸载现有版本记得勾选上保留数据，防止聊天记录丢失**
+![](images/img6.png)
