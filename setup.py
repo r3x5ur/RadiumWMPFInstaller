@@ -18,7 +18,7 @@ URL = 'https://github.com/r3x5ur/RadiumWMPFInstaller'
 EMAIL = 'me@example.com'
 AUTHOR = 'r3x5ur'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.1.3'
+VERSION = '0.1.4'
 
 # What packages are required for this module to be executed?
 REQUIRED = [

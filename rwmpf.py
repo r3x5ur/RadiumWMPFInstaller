@@ -130,7 +130,7 @@ def picker_version():
         use_shortcuts=True,
     ).ask()
     if result == ROLLBACK_VAL:
-        return f'curl "{WECHATSETUP}" -o {basename(WECHATSETUP)}', 'client'
+        return f'curl -L "{WECHATSETUP}" -o {basename(WECHATSETUP)}', 'client'
     if not result: return
     return get_command(result), 'RadiumWMPF'
 
